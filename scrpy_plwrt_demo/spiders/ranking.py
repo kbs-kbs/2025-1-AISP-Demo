@@ -1,5 +1,6 @@
 import scrapy
 from scrpy_plwrt_demo.items import ThumbnailItem
+import time # 디버깅을 위한 표준 라이브러리
 
 class RankingSpider(scrapy.Spider):
     name = 'ranking'
@@ -8,17 +9,33 @@ class RankingSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ranking_list = []
+        self.start_time = time.time()
 
     def start_requests(self):
         url = "https://pedia.watcha.com/ko-KR/?domain=movie"
-        yield scrapy.Request(url, self.parse_start)
+        yield scrapy.Request(url, self.parse)
         
-    def parse_start(self, response):
-        items = response.css('#root > div.kVmNFwyR > section > div > section > div:nth-child(2) > section > div.dmYmGzMK.listWrapper > ul')
-        for ranking, item in enumerate(items):
+    def parse(self, response):
+        items = response.css('#root > div:nth-of-type(1) > section > div > section > div:nth-of-type(1) > section > div.listWrapper > ul > li')
+        for i, item in enumerate(items):
             thumbnail = ThumbnailItem()
-            thumbnail['ranking'] = ranking
-            thumbnail['title'] = ranking
-            thumbnail['release_year'] = ranking
-            thumbnail['ranking'] = ranking
+            thumbnail['ranking'] = i + 1
+            thumbnail['title'] = item.css('a > div:nth-of-type(2) > div:nth-of-type(1)::text').get()
+            thumbnail['release_year'] = item.css('a > div:nth-of-type(2) > div:nth-of-type(2)::text').get().split()[0]
+            thumbnail['country'] = item.css('a > div:nth-of-type(2) > div:nth-of-type(2)::text').get().split()[-1]
+            description = item.css('a > div:nth-of-type(2) > div:nth-of-type(4)::text').get()
+            if description:
+                thumbnail['reservation'] = description.split()[1]
+                thumbnail['audience'] = description.split()[-1]
+            else:
+                thumbnail['reservation'] = ''
+                thumbnail['audience'] = ''
             
+            yield thumbnail
+            
+    # 디버깅을 위한 로그 출력 함수
+    def inform(self, name, value, *args):
+        info = { name: value }
+        if args:
+            info.update({ args[i]: args[i + 1] for i in range(0, len(args), 2) })
+        self.logger.info(f'{info} ({(time.time() - self.start_time):.1f}초)')

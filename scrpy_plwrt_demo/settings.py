@@ -97,9 +97,13 @@ DOWNLOAD_HANDLERS = {
 }
 PLAYWRIGHT_BROWSER_TYPE = 'chromium'
 PLAYWRIGHT_LAUNCH_OPTIONS = {
+    "args": [
+        "--disable-web-security",
+        "--disable-features=IsolateOrigins,site-per-process",
+    ],
 	'headless': False,
 	"timeout": 200000
 }
 LOG_LEVEL = 'INFO'
 PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT = 200000
-FEED_EXPORT_FIELDS=["issue_year", "title", "abstract", "link"]
+FEED_EXPORT_FIELDS=["ranking", "title", "release_year", "country", "reservation", "audience"]
