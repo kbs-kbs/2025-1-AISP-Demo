@@ -1,5 +1,6 @@
 import scrapy
-from scrapy.selector import Selector
+from scrapy_playwright.page import PageMethod
+from playwright.async_api import async_playwright
 import time
 from scrpy_plwrt_demo.items import CommentItem
 
@@ -7,7 +8,8 @@ class CommentsSpider(scrapy.Spider):
     name = 'comments'
     allowed_domains = ['pedia.watcha.com']
     custom_settings = {
-        'FEED_EXPORT_FIELDS': ["user", "comment", "like"]
+        'FEED_EXPORT_FIELDS': ["user", "comment", "like"],
+        'PLAYWRIGHT_ABORT_REQUEST': lambda req: req.resource_type in ['image', 'stylesheet', 'font', 'media']
     }
     
     def __init__(self, movie_id, *args, **kwargs):
@@ -15,43 +17,53 @@ class CommentsSpider(scrapy.Spider):
         self.movie_id = movie_id
         self.start_time = time.time()
 
+    
+
     def start_requests(self):
+        scrolling_script = """
+        const scrolls = 20
+        let scrollCount = 0
+
+        // scroll down and then wait for 0.5s
+        const scrollInterval = setInterval(() => {
+          window.scrollTo(0, document.body.scrollHeight)
+          scrollCount++
+
+          if (scrollCount === scrolls) {
+            clearInterval(scrollInterval)
+          }
+        }, 500)
+        """
+        
         yield scrapy.Request(
             url=f'https://pedia.watcha.com/ko-KR/contents/{self.movie_id}/comments',
             meta={
                 "playwright": True,
                 "playwright_include_page": True,
-                "playwright_page_goto_kwargs": {
-                    "timeout": 200000,
-                    "wait_until": "domcontentloaded"
-                },
+                "playwright_page_methods": [
+                    PageMethod("wait_for_selector", "#root > div:nth-of-type(1) > section > section > div > div > div > ul > div"),
+                    PageMethod("evaluate", scrolling_script),
+                ],
             },
             callback=self.parse
         )
 
     async def parse(self, response):
         page = response.meta["playwright_page"]
+        scrolls = 20
+        scroll_count = 0
+
+        while scroll_count < scrolls:
+            # 스크롤 실행
+            await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+
+            # 대기 시간 설정
+            await page.wait_for_timeout(500)  # 0.5초
+
+            scroll_count += 1
+            print(f"스크롤 횟수: {scroll_count}/{scrolls}")
         
-        page.set_default_timeout(20000)
-        await page.wait_for_timeout(5000)
-        try:
-            last_position = await page.evaluate("window.scrollY")
-            while True:
-                # scroll by 700 while not at the bottom
-                await page.evaluate("window.scrollBy(0, 20000)")
-                current_position = await page.evaluate("window.scrollY")
-                if current_position == last_position:
-                    print("Reached the bottom of the page.")
-                    break
-                last_position = current_position
-                self.inform('스크롤', '스크롤')
-        except Exception as error:
-            print(f"Error: {error}")
-            pass
-        
-        content = await page.content()
-        selector = Selector(text=content)
-        items = selector.css('#root > div:nth-of-type(1) > section > section > div > div > div > ul > div:not(:last-child)')
+        items = response.css('#root > div:nth-of-type(1) > section > section > div > div > div > ul > div:not(:last-child)')
         for item in items:
             comment = CommentItem()
             comment['user'] = item.css('div:nth-of-type(1) > div:nth-of-type(1) > a > div:nth-of-type(2)::text').get()
