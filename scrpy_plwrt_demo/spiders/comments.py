@@ -1,6 +1,5 @@
 import scrapy
 from scrapy.selector import Selector
-from scrapy_playwright.page import PageMethod
 import time
 from scrpy_plwrt_demo.items import CommentItem
 
@@ -39,13 +38,13 @@ class CommentsSpider(scrapy.Spider):
             last_position = await page.evaluate("window.scrollY")
             while True:
                 # scroll by 700 while not at the bottom
-                await page.evaluate("window.scrollBy(0, 700)")
-                await page.wait_for_timeout(750) # wait for 750ms for the request to complete
+                await page.evaluate("window.scrollBy(0, 20000)")
                 current_position = await page.evaluate("window.scrollY")
                 if current_position == last_position:
                     print("Reached the bottom of the page.")
                     break
                 last_position = current_position
+                self.inform('스크롤', '스크롤')
         except Exception as error:
             print(f"Error: {error}")
             pass
@@ -60,6 +59,7 @@ class CommentsSpider(scrapy.Spider):
             comment['like'] = item.css('div:nth-of-type(3) > em:nth-of-type(1)::text').get()
         
             yield comment
+        self.inform('스크롤', '끝')
         
 
     # 디버깅을 위한 로그 출력 함수

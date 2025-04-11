@@ -1,5 +1,4 @@
 import scrapy
-from scrapy_playwright.page import PageMethod
 from urllib.parse import urlencode # query_params 딕셔너리를 query_string으로 변환하기 위한 표준 라이브러리
 import time # 디버깅을 위한 표준 라이브러리
 import math

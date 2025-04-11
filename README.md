@@ -13,4 +13,4 @@
 # 도메인별로 따로 실행
 1. `venv\Scripts\activate` 및 편집기에서 가상환경 활성화
 2. `scrapy crawl ranking -O csv/ranking.csv`: dbpia 크롤링 + csv로 저장
-3. `scrapy crawl comments -O csv/comments.csv`: riss 크롤링 + csv로 저장
+3. `scrapy crawl comments -O csv/comments.csv -a movie_id=mdKpkjk`: riss 크롤링 + csv로 저장
