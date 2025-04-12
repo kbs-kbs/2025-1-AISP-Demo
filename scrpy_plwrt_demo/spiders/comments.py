@@ -41,7 +41,7 @@ class CommentsSpider(scrapy.Spider):
     
                 return new Promise(resolve => {
                     const interval = setInterval(() => {
-                        if (commentCount + 9 >= enoughCommentCount) {
+                        if (commentCount > enoughCommentCount) {
                             clearInterval(interval);
                             resolve(true);  // 스크롤 완료
                         }
