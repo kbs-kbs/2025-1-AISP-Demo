@@ -15,9 +15,9 @@
 ```python
 uv run scrapy crawl ranking -O csv/ranking.csv
 ```
-## 왓챠 영화 Top 10
+## 왓챠 영화 순위 Top 10
 ```python
-uv run scrapy crawl watcha_ranking -O csv/ranking.csv
+uv run scrapy crawl watcha_ranking -O csv/watcha_ranking.csv
 ```
 ## 영화 최신 코멘트 Top 900
 ```python
