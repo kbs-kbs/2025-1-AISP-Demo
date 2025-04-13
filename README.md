@@ -1,8 +1,7 @@
 # 최초 환경 설정
-## 1. Powershell로 UV 설치
-1. `Set-ExecutionPolicy RemoteSigned CurrentUser`
+## 1. Powershell로 uv 설치
+1. `Set-ExecutionPolicy RemoteSigned Process`
 2. `irm https://astral.sh/uv/install.ps1 | iex`
-3. `Set-ExecutionPolicy Undefined CurrentUser`
 
 ## 2. Command Prompt로 의존성 패키지 설치
 1. `uv init` 후 `pyproject.toml` 파일 작성
