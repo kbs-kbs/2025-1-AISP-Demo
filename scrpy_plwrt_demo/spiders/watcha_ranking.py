@@ -15,7 +15,7 @@ class WatchaRankingSpider(scrapy.Spider):
         yield scrapy.Request(url, self.parse)
         
     def parse(self, response):
-        items = response.css('#root > div:nth-of-type(1) > section > div > section > div:nth-of-type(1) > section > div.listWrapper > ul > li')
+        items = response.css('#root > div.nth-of-type(1) > section > div > section > div:nth-of-type(5) > section > div.listWrapper > ul > li')
         for i, item in enumerate(items):
             thumbnail = ThumbnailItem()
             thumbnail['ranking'] = i + 1
