@@ -8,7 +8,7 @@
 2. `uv run playwright install`
 
 # 실행
-1. `uv run streamlit run app.py`: 실행
+1. `uv run streamlit run app.py`
 
 # 도메인별로 실행
 ## 박스 오피스 순위 Top 10
