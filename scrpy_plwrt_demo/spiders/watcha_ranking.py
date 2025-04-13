@@ -22,6 +22,8 @@ class WatchaRankingSpider(scrapy.Spider):
             thumbnail['title'] = item.css('a > div:nth-of-type(2) > div:nth-of-type(1)::text').get()
             thumbnail['release_year'] = item.css('a > div:nth-of-type(2) > div:nth-of-type(2)::text').get().split()[0]
             thumbnail['country'] = item.css('a > div:nth-of-type(2) > div:nth-of-type(2)::text').get().split()[-1]
+            thumbnail['reservation'] = ''
+            thumbnail['audience'] = ''
             
             yield thumbnail
 
