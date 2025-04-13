@@ -9,6 +9,7 @@ dependencies = [
     "scikit-learn==1.6.1",
     "scrapy-playwright==0.0.43",
     "streamlit==1.43.2",
+    "streamlit-option-menu>=0.4.0",
     "torch==2.6.0",
     "transformers==4.50.3",
 ]

@@ -1,6 +1,0 @@
-streamlit==1.43.2
-scrapy-playwright==0.0.43
-pandas==2.2.3
-scikit-learn==1.6.1
-transformers==4.50.3
-torch==2.6.0

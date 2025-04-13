@@ -1,6 +1,6 @@
 import scrapy
 from scrpy_plwrt_demo.items import ThumbnailItem
-import time # 디버깅을 위한 표준 라이브러리
+import time
 
 class RankingSpider(scrapy.Spider):
     name = 'ranking'
@@ -8,7 +8,6 @@ class RankingSpider(scrapy.Spider):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ranking_list = []
         self.start_time = time.time()
 
     def start_requests(self):
@@ -32,7 +31,7 @@ class RankingSpider(scrapy.Spider):
                 thumbnail['audience'] = ''
             
             yield thumbnail
-            
+
     # 디버깅을 위한 로그 출력 함수
     def inform(self, name, value, *args):
         info = { name: value }
