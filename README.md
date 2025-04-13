@@ -15,7 +15,12 @@
 # 실행
 1. `uv run python pipeline.py`: 실행
 
-# 도메인별로 따로 실행
-1. `venv\Scripts\activate` 및 편집기에서 가상환경 활성화
-2. `scrapy crawl ranking -O csv/ranking.csv`: dbpia 크롤링 + csv로 저장
-3. `uv run scrapy crawl comments -O csv/comments.csv -a movie_id=m5ekxEM`: riss 크롤링 + csv로 저장
+# 도메인별로 실행
+## 박스 오피스 순위 Top 10
+```python
+uv run scrapy crawl ranking -O csv/ranking.csv
+```
+## 영화 최신 코멘트 Top 900
+```python
+uv run scrapy crawl comments -O csv/comments.csv -a movie_id=m5ekxEM
+```
