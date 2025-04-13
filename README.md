@@ -4,11 +4,8 @@
 2. `irm https://astral.sh/uv/install.ps1 | iex`
 
 ## 2. Command Prompt로 의존성 패키지 설치
-1. `uv init -p 3.12.10`
-2. `uv venv`
-3. `uv add -r requirements.txt`
-4. `uv sync`
-5. `uv run playwright install`
+1. `uv sync`
+2. `uv run playwright install`
 
 # 실행
 1. `uv run streamlit run app.py`: 실행
