@@ -1,12 +1,28 @@
 import streamlit as st
-from module.watcha_pedia_scraper.run_ranking_scraper import run_ranking_scraper
+import pandas as pd
+from module.watcha_pedia_scraper.run_rankings_scraper import run_rankings_scraper
 
 # @st.cache_data(ttl=3600)
 def get_cached_data():
-    return run_ranking_scraper()
+    run_rankings_scraper()
+    return [
+        pd.read_csv("csv/box_office_ranking.csv"),
+        pd.read_csv("csv/watcha_ranking.csv"),
+        pd.read_csv("csv/netflix_ranking.csv")
+    ]
 
 def run_home():
-    ranking_df = get_cached_data()  # 캐시된 데이터 사용
+    (
+        box_office_ranking_df,
+        watcha_ranking_df,
+        netflix_ranking_df
+    ) = get_cached_data()
 
     st.markdown('# 박스 오피스 순위 Top 10')
-    st.dataframe(ranking_df)
+    st.dataframe(box_office_ranking_df)
+
+    st.markdown('# 왓챠 영화 순위 Top 10')
+    st.dataframe(watcha_ranking_df)
+
+    st.markdown('# 넷플릭스 영화 순위 Top 10')
+    st.dataframe(netflix_ranking_df)

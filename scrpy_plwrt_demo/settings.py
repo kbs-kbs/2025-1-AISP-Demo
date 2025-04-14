@@ -62,9 +62,9 @@ ROBOTSTXT_OBEY = False
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    "scrpy_plwrt_demo.pipelines.ScrpyPlwrtDemoPipeline": 300,
-#}
+ITEM_PIPELINES = {
+    "scrpy_plwrt_demo.pipelines.ScrpyPlwrtDemoPipeline": 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
@@ -106,4 +106,4 @@ PLAYWRIGHT_LAUNCH_OPTIONS = {
 }
 LOG_LEVEL = 'INFO'
 PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT = 200000
-FEED_EXPORT_FIELDS=["ranking", "title", "release_year", "country", "reservation", "audience"]
+FEED_EXPORT_FIELDS=["section", "ranking", "title", "release_year", "country", "reservation", "audience"]
