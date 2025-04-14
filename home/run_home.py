@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
-from module.watcha_pedia_scraper.run_rankings_scraper import run_rankings_scraper
+import module.watcha_pedia_crawler.rankings_crawler as wc
 
 # @st.cache_data(ttl=3600)
 def get_cached_data():
-    run_rankings_scraper()
+    wc.crawl()
     return [
         pd.read_csv("csv/box_office_ranking.csv"),
         pd.read_csv("csv/watcha_ranking.csv"),

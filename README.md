@@ -10,16 +10,10 @@
 # 실행
 1. `uv run streamlit run app.py`
 
-# 도메인별로 실행
-## 박스 오피스 순위 Top 10
-```python
-uv run scrapy crawl ranking -O csv/ranking.csv
+# 모듈별 실행
+```bash
+uv run module\watcha_pedia_crawler\rankings_crawler.py
 ```
-## 왓챠 영화 순위 Top 10
-```python
-uv run scrapy crawl watcha_ranking -O csv/watcha_ranking.csv
-```
-## 영화 최신 코멘트 Top 900
-```python
-uv run scrapy crawl comments -O csv/comments.csv -a movie_id=m5ekxEM
+```bash
+uv run module\watcha_pedia_crawler\comments_crawler.py
 ```

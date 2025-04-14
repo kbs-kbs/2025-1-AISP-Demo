@@ -106,4 +106,3 @@ PLAYWRIGHT_LAUNCH_OPTIONS = {
 }
 LOG_LEVEL = 'INFO'
 PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT = 200000
-FEED_EXPORT_FIELDS=["section", "ranking", "title", "release_year", "country", "reservation", "audience"]

@@ -9,7 +9,7 @@ class CommentsSpider(scrapy.Spider):
     allowed_domains = ['pedia.watcha.com']
     custom_settings = {
         'FEED_EXPORT_FIELDS': ["user", "comment", "like"],
-        'PLAYWRIGHT_ABORT_REQUEST': lambda req: req.resource_type in ['image', 'stylesheet', 'font', 'media']
+        'PLAYWRIGHT_ABORT_REQUEST': lambda req: req.resource_type in ['stylesheet', 'image', 'media', 'font']
     }
 
     def __init__(self, movie_id, *args, **kwargs):
