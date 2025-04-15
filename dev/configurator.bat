@@ -1,6 +1,6 @@
 @echo off
-set "version=3.13"
-set "path=%USERPROFILE%\AppData\Local\Programs\Python\Python%version:.=%"
+set "version=3.12"
+set "path=%USERPROFILE%\AppDasta\Local\Programs\Python\Python%version:.=%"
 
 if exist "%path%" (
 (

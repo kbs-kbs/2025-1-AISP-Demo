@@ -7,7 +7,7 @@ class CommentItem(scrapy.Item):
 
 class ThumbnailItem(scrapy.Item):
     section=scrapy.Field()
-    ranking=scrapy.Field()
+    rank=scrapy.Field()
     title=scrapy.Field()
     release_year=scrapy.Field()
     country=scrapy.Field()

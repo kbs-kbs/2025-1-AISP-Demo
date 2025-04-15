@@ -39,7 +39,7 @@ class RankingsSpider(scrapy.Spider):
         for i, item in enumerate(items):
             thumbnail = ThumbnailItem()
             thumbnail['section'] = section
-            thumbnail['ranking'] = i + 1
+            thumbnail['rank'] = i + 1
             thumbnail['title'] = item.css('a > div:nth-of-type(2) > div:nth-of-type(1)::text').get()
             thumbnail['release_year'] = item.css('a > div:nth-of-type(2) > div:nth-of-type(2)::text').get().split()[0]
             thumbnail['country'] = item.css('a > div:nth-of-type(2) > div:nth-of-type(2)::text').get().split()[-1]

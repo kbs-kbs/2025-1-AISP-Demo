@@ -4,13 +4,13 @@ class ScrpyPlwrtDemoPipeline:
     def open_spider(self, spider):
         self.exporters = {
             'box_office': CsvItemExporter(open('csv/box_office_ranking.csv', 'wb'), fields_to_export=[
-                'ranking', 'title', 'release_year', 'country', 'reservation', 'audience', 'image_url'
+                'rank', 'title', 'release_year', 'country', 'reservation', 'audience', 'image_url'
             ]),
             'watcha': CsvItemExporter(open('csv/watcha_ranking.csv', 'wb'), fields_to_export=[
-                'ranking', 'title', 'release_year', 'country', 'image_url'
+                'rank', 'title', 'release_year', 'country', 'image_url'
             ]),
             'netflix': CsvItemExporter(open('csv/netflix_ranking.csv', 'wb'), fields_to_export=[
-                'ranking', 'title', 'release_year', 'country', 'image_url'
+                'rank', 'title', 'release_year', 'country', 'image_url'
             ]),
         }
         for exporter in self.exporters.values():
