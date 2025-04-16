@@ -27,5 +27,4 @@ class MovieItem(scrapy.Item):
     description=scrapy.Field()
     cast=scrapy.Field()
     image_url=scrapy.Field()
-    url=scrapy.Field()
 

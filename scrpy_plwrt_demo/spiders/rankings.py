@@ -51,6 +51,7 @@ class RankingsSpider(scrapy.Spider):
                 thumbnail['reservation'] = '집계 중'
                 thumbnail['audience'] = '집계 중'
             thumbnail['image_url'] = item.css('a > div:nth-of-type(1) > div:nth-of-type(1) > img::attr(src)').get()
+            thumbnail['url'] = 'https://pedia.watcha.com' + item.css('a::attr(href)').get()
             yield thumbnail
 
     def inform(self, name, value, *args):

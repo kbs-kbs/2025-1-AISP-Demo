@@ -3,6 +3,11 @@ import pandas as pd
 import module.watcha_pedia_crawler.rankings_crawler as wc
 from datetime import datetime
 
+if 'is_detail' not in st.session_state:
+    st.session_state['isDetail'] = False
+if 'detail_url' not in st.session_state:
+    st.session_state['detail_url'] = ''
+
 @st.cache_data(ttl=3600)
 def get_cached_data():
     wc.crawl()
@@ -13,6 +18,9 @@ def get_cached_data():
         pd.read_csv("csv/netflix_ranking.csv"),
         update_time
     ]
+
+if 'detail_url' not in st.session_state:
+    st.session_state['detail_url'] = ''
 
 def run_home():
     (

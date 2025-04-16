@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from home.run_home import run_home
+from home.index import run_home
 
 def main():
     st.set_page_config(page_title="캡슐러", layout='wide')
