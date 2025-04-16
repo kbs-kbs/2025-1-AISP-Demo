@@ -1,16 +1,25 @@
 import streamlit as st
 import pandas as pd
-import module.watcha_pedia_crawler.rankings_crawler as wc
+from module.watcha_pedia_crawler import rankings_crawler
+from module.watcha_pedia_crawler import comments_crawler
 from datetime import datetime
+import pickle
+import numpy as np
+import matplotlib.pyplot as plt
+import re
+import urllib.request
+from konlpy.tag import Okt
+from tqdm import tqdm
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-if 'is_detail' not in st.session_state:
-    st.session_state['isDetail'] = False
-if 'detail_url' not in st.session_state:
-    st.session_state['detail_url'] = ''
+if "selected_movie_id" not in st.session_state:
+    st.session_state['selected_movie_id'] = None
+
 
 @st.cache_data(ttl=3600)
-def get_cached_data():
-    wc.crawl()
+def get_rankings_data():
+    rankings_crawler.crawl()
     update_time = datetime.now().strftime('%Y-%m-%d %H:%M')
     return [
         pd.read_csv("csv/box_office_ranking.csv"),
@@ -19,16 +28,18 @@ def get_cached_data():
         update_time
     ]
 
-if 'detail_url' not in st.session_state:
-    st.session_state['detail_url'] = ''
+@st.cache_data(ttl=3600)
+def get_comments_data(movie_id):
+    comments_crawler.crawl(movie_id)
+    return pd.read_csv("csv/comments.csv")
 
-def run_home():
+def show_main():
     (
         box_office_ranking_df,
         watcha_ranking_df,
         netflix_ranking_df,
         update_time
-    ) = get_cached_data()
+    ) = get_rankings_data()
 
     st.markdown(
         """
@@ -81,13 +92,17 @@ def run_home():
 
     st.markdown('# 박스 오피스 순위 Top 10')
     if st.button(f"마지막 업데이트: {update_time} 🔄", key='box_office_ranking_update_button'):
-        get_cached_data.clear()
+        get_rankings_data.clear()
         st.rerun()
     for row in range(0, 10, 5):  # 0-4, 5-9
         cols = st.columns(5)
         for idx in range(5):
             data = box_office_ranking_df.iloc[row + idx]
             with cols[idx]:
+                clicked = st.button("", key=f"{data['movie_id']}-img-btn")
+                if clicked:
+                    st.session_state['selected_movie_id'] = data['movie_id']  # 영화 데이터 저장
+                    st.rerun()
                 st.markdown(
                     f'<p class="movie-rank">{data['rank']}위</p>', 
                     unsafe_allow_html=True
@@ -122,7 +137,7 @@ def run_home():
 
     st.markdown('# 왓챠 영화 순위 Top 10')
     if st.button(f"마지막 업데이트: {update_time} 🔄", key='watcha_ranking_update_button'):
-        get_cached_data.clear()
+        get_rankings_data.clear()
         st.rerun()
     for row in range(0, 10, 5):  # 0-4, 5-9
         cols = st.columns(5)
@@ -162,7 +177,7 @@ def run_home():
 
     st.markdown('# 넷플릭스 영화 순위 Top 10')
     if st.button(f"마지막 업데이트: {update_time} 🔄", key='netflix_ranking_update_button'):
-        get_cached_data.clear()
+        get_rankings_data.clear()
         st.rerun()
     for row in range(0, 10, 5):  # 0-4, 5-9
         cols = st.columns(5)
@@ -200,6 +215,21 @@ def run_home():
                         unsafe_allow_html=True
                     )
 
-    st.dataframe(box_office_ranking_df)
-    st.dataframe(watcha_ranking_df)
-    st.dataframe(netflix_ranking_df)
+def show_detail():
+    comments_df = get_comments_data(st.session_state['selected_movie_id'])
+    
+    # 뒤로 가기 버튼
+    if st.button("← 목록으로 돌아가기"):
+        st.session_state.selected_movie_id = None
+        st.rerun()
+    
+    # 상세 내용 레이아웃
+    st.markdown(f"# 영화 상세 정보")
+    st.markdown(f"## 댓글 긍/부정 비율")
+    st.dataframe(comments_df)
+
+def run_home():
+    if st.session_state.selected_movie_id:
+        show_detail()
+    else:
+        show_main()

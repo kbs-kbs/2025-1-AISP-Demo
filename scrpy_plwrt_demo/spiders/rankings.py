@@ -32,8 +32,8 @@ class RankingsSpider(scrapy.Spider):
         self.inform('섹션', section)
         section_nums = {
             'box_office': 1,
-            'watcha': 5,
-            'netflix': 7
+            'watcha': 4,
+            'netflix': 6
         }
         items = response.css(f'#root > div:nth-of-type(1) > section > div > section > div:nth-of-type({section_nums[section]}) > section > div.listWrapper > ul > li')
         for i, item in enumerate(items):
@@ -50,8 +50,9 @@ class RankingsSpider(scrapy.Spider):
             else:
                 thumbnail['reservation'] = '집계 중'
                 thumbnail['audience'] = '집계 중'
+            thumbnail['movie_id'] = item.css('a::attr(href)').get().split('/')[-1]
             thumbnail['image_url'] = item.css('a > div:nth-of-type(1) > div:nth-of-type(1) > img::attr(src)').get()
-            thumbnail['url'] = 'https://pedia.watcha.com' + item.css('a::attr(href)').get()
+
             yield thumbnail
 
     def inform(self, name, value, *args):

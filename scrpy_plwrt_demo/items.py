@@ -13,8 +13,8 @@ class ThumbnailItem(scrapy.Item):
     country=scrapy.Field()
     reservation=scrapy.Field()
     audience=scrapy.Field()
+    movie_id=scrapy.Field()
     image_url=scrapy.Field()
-    url=scrapy.Field()
 
 class MovieItem(scrapy.Item):
     title=scrapy.Field()
@@ -24,7 +24,7 @@ class MovieItem(scrapy.Item):
     genre=scrapy.Field()
     running_time=scrapy.Field()
     rating=scrapy.Field()
-    description=scrapy.Field()
+    plot=scrapy.Field()
     cast=scrapy.Field()
     image_url=scrapy.Field()
 
