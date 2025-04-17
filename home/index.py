@@ -6,6 +6,9 @@ from datetime import datetime
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import matplotlib.pyplot as plt
+import numpy as np
+import random
+
 
 if "selected_movie_id" not in st.session_state:
     st.session_state['selected_movie_id'] = None
@@ -79,6 +82,34 @@ def show_main():
         .st-key-netflix_ranking_update_button > div > button > div > p {
             font-size: 12px !important;
         }
+        div[class*=img-btn] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        div[class*=img-btn] > div {
+            width: 100%;
+            height: 100%;
+        }
+        div[class*=img-btn] > div > button {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: initial;
+        }
+        
+        div[class*=back-btn] {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+        }
+        
+        div[class*=back-btn] > button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background-color: initial;
+        }
         </style>
         """,
         unsafe_allow_html=True
@@ -93,10 +124,6 @@ def show_main():
         for idx in range(5):
             data = box_office_ranking_df.iloc[row + idx]
             with cols[idx]:
-                clicked = st.button("", key=f"{data['movie_id']}-img-btn")
-                if clicked:
-                    st.session_state['selected_movie_id'] = data['movie_id']  # 영화 데이터 저장
-                    st.rerun()
                 st.markdown(
                     f'<p class="movie-rank">{data['rank']}위</p>', 
                     unsafe_allow_html=True
@@ -127,6 +154,9 @@ def show_main():
                         f'<p class="field-value">{data['audience']}</p>', 
                         unsafe_allow_html=True
                     )
+                if st.button("", key=f"{data['movie_id']}-img-btn"):
+                    st.session_state['selected_movie_id'] = data['movie_id']  # 영화 데이터 저장
+                    st.rerun()
     
 
     st.markdown('# 왓챠 영화 순위 Top 10')
@@ -168,6 +198,9 @@ def show_main():
                         f'<p class="field-value">{data['country']}</p>', 
                         unsafe_allow_html=True
                     )
+                if st.button("", key=f"{data['movie_id']}-img-btn"):
+                    st.session_state['selected_movie_id'] = data['movie_id']  # 영화 데이터 저장
+                    st.rerun()
 
     st.markdown('# 넷플릭스 영화 순위 Top 10')
     if st.button(f"마지막 업데이트: {update_time} 🔄", key='netflix_ranking_update_button'):
@@ -208,17 +241,47 @@ def show_main():
                         f'<p class="field-value">{data['country']}</p>', 
                         unsafe_allow_html=True
                     )
+                if st.button("", key=f"{data['movie_id']}-img-btn"):
+                    st.session_state['selected_movie_id'] = data['movie_id']  # 영화 데이터 저장
+                    st.rerun()
 
 def show_detail():
+    st.markdown(
+        """
+        <style>
+        div[class*=back-btn] {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+        }
+        
+        div[class*=back-btn] > div {
+            width: 100%;
+            height: 100%;
+        }
+        div[class*=back-btn] > div > button {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: initial;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    
     comments_df = get_comments_data(st.session_state['selected_movie_id'])
     comments_df = comments_df.dropna(subset=['comment'])
 
-    if st.button("← 목록으로 돌아가기"):
-        st.session_state.selected_movie_id = None
-        st.rerun()
+    back_col = st.columns(1)[0]
+    with back_col:
+        st.markdown('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/></svg>', unsafe_allow_html=True)
+        if st.button("", key="back-btn"):
+            st.session_state.selected_movie_id = None
+            st.rerun()
 
     st.markdown(f"# 영화 상세 정보")
-    st.markdown(f"## 댓글 긍/부정 비율")
+    st.markdown(f"### 댓글 긍/부정 비율")
     st.dataframe(comments_df)
 
     MODEL_NAME = "beomi/KcELECTRA-base"

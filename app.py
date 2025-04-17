@@ -2,6 +2,9 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from home.index import run_home
 
+if "selected_movie_id" not in st.session_state:
+    st.session_state['selected_movie_id'] = None
+
 def main():
     st.set_page_config(page_title="캡슐러", layout='wide')
     with st.sidebar:
