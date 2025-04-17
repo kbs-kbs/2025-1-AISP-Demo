@@ -3,15 +3,9 @@ import pandas as pd
 from module.watcha_pedia_crawler import rankings_crawler
 from module.watcha_pedia_crawler import comments_crawler
 from datetime import datetime
-import pickle
-import numpy as np
+import torch
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import matplotlib.pyplot as plt
-import re
-import urllib.request
-from konlpy.tag import Okt
-from tqdm import tqdm
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 if "selected_movie_id" not in st.session_state:
     st.session_state['selected_movie_id'] = None
@@ -217,16 +211,58 @@ def show_main():
 
 def show_detail():
     comments_df = get_comments_data(st.session_state['selected_movie_id'])
-    
-    # 뒤로 가기 버튼
+    comments_df = comments_df.dropna(subset=['comment'])
+
     if st.button("← 목록으로 돌아가기"):
         st.session_state.selected_movie_id = None
         st.rerun()
-    
-    # 상세 내용 레이아웃
+
     st.markdown(f"# 영화 상세 정보")
     st.markdown(f"## 댓글 긍/부정 비율")
     st.dataframe(comments_df)
+
+    MODEL_NAME = "beomi/KcELECTRA-base"
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+    model.eval()
+
+    def batch_predict_sentiment(texts):
+        inputs = tokenizer(texts, return_tensors="pt", truncation=True, padding=True, max_length=128)
+        with torch.no_grad():
+            outputs = model(**inputs)
+            preds = torch.argmax(outputs.logits, dim=1).tolist()
+        return preds
+
+    comments = comments_df['comment'].astype(str).tolist()
+    preds = []
+    batch_size = 64
+    for i in range(0, len(comments), batch_size):
+        batch = comments[i:i+batch_size]
+        preds.extend(batch_predict_sentiment(batch))
+
+    # ------------------------------
+    # 여기서 부정/긍정 강제 뒤집기!!
+    preds_named = []
+    for p in preds:
+        if p == 0:
+            preds_named.append("긍정")
+        elif p == 1:
+            preds_named.append("부정")
+    # ------------------------------
+
+    pos = preds_named.count("긍정")
+    neg = preds_named.count("부정")
+
+    st.write(f"긍정: {pos}, 부정: {neg}")
+
+    plt.rc('font', family='Malgun Gothic')
+    plt.rc('axes', unicode_minus=False)
+    fig, ax = plt.subplots()
+    ax.pie([neg, pos], labels=["부정", "긍정"], autopct="%.1f%%", startangle=90, colors=['#ff9999','#66b3ff'])
+    ax.axis('equal')
+    st.pyplot(fig)
+
+
 
 def run_home():
     if st.session_state.selected_movie_id:
