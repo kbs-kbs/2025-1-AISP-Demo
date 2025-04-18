@@ -4,10 +4,8 @@ from module.watcha_pedia_crawler import rankings_crawler
 from module.watcha_pedia_crawler import comments_crawler
 from datetime import datetime
 import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import pipeline
 import matplotlib.pyplot as plt
-import numpy as np
-import random
 
 
 if "selected_movie_id" not in st.session_state:
@@ -271,7 +269,15 @@ def show_detail():
     )
     
     comments_df = get_comments_data(st.session_state['selected_movie_id'])
-    comments_df = comments_df.dropna(subset=['comment'])
+    comments_df.info()
+    comments_df['comment'] = comments_df['comment'].astype('string')
+    comments_df.info()
+    comments_df = comments_df[comments_df['comment'] != '']
+    comments_df.info()
+    comments_df = comments_df.dropna()
+    comments_df.info()
+    comments = comments_df['comment'].tolist()
+
 
     back_col = st.columns(1)[0]
     with back_col:
@@ -284,39 +290,21 @@ def show_detail():
     st.markdown(f"### 댓글 긍/부정 비율")
     st.dataframe(comments_df)
 
-    MODEL_NAME = "beomi/KcELECTRA-base"
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-    model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
-    model.eval()
+    classifier = pipeline(
+        "sentiment-analysis",
+        model="sangrimlee/bert-base-multilingual-cased-nsmc",
+        tokenizer="sangrimlee/bert-base-multilingual-cased-nsmc"
+    )
 
-    def batch_predict_sentiment(texts):
-        inputs = tokenizer(texts, return_tensors="pt", truncation=True, padding=True, max_length=128)
-        with torch.no_grad():
-            outputs = model(**inputs)
-            preds = torch.argmax(outputs.logits, dim=1).tolist()
-        return preds
+    # 감성분류 (batch로 여러 댓글 한 번에 예측)
+    results = classifier(comments, truncation=True, max_length=128)
+    # 결과에서 label만 추출
+    pred_labels = [r['label'] for r in results]  # 'LABEL_0' (부정), 'LABEL_1' (긍정)
 
-    comments = comments_df['comment'].astype(str).tolist()
-    preds = []
-    batch_size = 64
-    for i in range(0, len(comments), batch_size):
-        batch = comments[i:i+batch_size]
-        preds.extend(batch_predict_sentiment(batch))
-
-    # ------------------------------
-    # 여기서 부정/긍정 강제 뒤집기!!
-    preds_named = []
-    for p in preds:
-        if p == 0:
-            preds_named.append("긍정")
-        elif p == 1:
-            preds_named.append("부정")
-    # ------------------------------
-
-    pos = preds_named.count("긍정")
-    neg = preds_named.count("부정")
-
-    st.write(f"긍정: {pos}, 부정: {neg}")
+    # 원형 차트용 데이터 집계
+    pos = pred_labels.count("positive")
+    neg = pred_labels.count("negative")
+    st.write(f"긍정: {pos}개, 부정: {neg}개")
 
     plt.rc('font', family='Malgun Gothic')
     plt.rc('axes', unicode_minus=False)
@@ -324,6 +312,12 @@ def show_detail():
     ax.pie([neg, pos], labels=["부정", "긍정"], autopct="%.1f%%", startangle=90, colors=['#ff9999','#66b3ff'])
     ax.axis('equal')
     st.pyplot(fig)
+
+    # 각 항목별 결과 표로 보여주기
+    # 결과 label을 한글로 변환
+    label_map = {"negative": "부정", "positive": "긍정"}
+    comments_df["분류결과"] = [label_map.get(l, l) for l in pred_labels]
+    st.dataframe(comments_df[["comment", "분류결과"]])  # 필요한 열만 보여주기
 
 
 
