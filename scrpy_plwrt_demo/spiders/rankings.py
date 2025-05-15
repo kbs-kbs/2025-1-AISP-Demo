@@ -31,9 +31,9 @@ class RankingsSpider(scrapy.Spider):
     def process_section(self, response, section):
         self.inform('섹션', section)
         section_nums = {
-            'box_office': 1,
-            'watcha': 5,
-            'netflix': 7
+            'box_office': 2,
+            'watcha': 6,
+            'netflix': 8
         }
         items = response.css(f'#root > div:nth-of-type(1) > section > div > section > div:nth-of-type({section_nums[section]}) > section > div.listWrapper > ul > li')
         for i, item in enumerate(items):
