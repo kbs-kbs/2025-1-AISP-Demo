@@ -32,7 +32,8 @@ def main():
     """, unsafe_allow_html=True)
     st.logo("images/logo-default.svg", size="large")
     selected = option_menu(
-        None, ["홈", "북마크"],
+        None,
+        ["홈", "북마크"],
         icons=[" ", " "],
         default_index=0,
         orientation="horizontal",
